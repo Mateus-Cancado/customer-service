@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: customer-postgres
+    environment:
+      POSTGRES_DB: customer_db
+      POSTGRES_USER: customer
+      POSTGRES_PASSWORD: customer
+    ports:
+      - "5432:5432"
+    volumes:
+      - customer-pgdata:/var/lib/postgresql/data
+
+volumes:
+  customer-pgdata:
