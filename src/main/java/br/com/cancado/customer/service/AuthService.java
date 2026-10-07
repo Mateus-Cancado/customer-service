@@ -1,11 +1,15 @@
 package br.com.cancado.customer.service;
 
 import br.com.cancado.customer.dto.CustomerResponseDTO;
+import br.com.cancado.customer.dto.LoginRequestDTO;
 import br.com.cancado.customer.dto.RegisterRequestDTO;
+import br.com.cancado.customer.dto.TokenResponseDTO;
 import br.com.cancado.customer.exception.EmailAlreadyExistsException;
+import br.com.cancado.customer.exception.InvalidCredentialsException;
 import br.com.cancado.customer.mapper.CustomerMapper;
 import br.com.cancado.customer.model.Customer;
 import br.com.cancado.customer.repository.CustomerRepository;
+import br.com.cancado.customer.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +25,7 @@ public class AuthService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Transactional
     public CustomerResponseDTO register(RegisterRequestDTO request) {
@@ -39,5 +44,21 @@ public class AuthService {
         } catch (DataIntegrityViolationException e) {
             throw new EmailAlreadyExistsException(normalizedEmail);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public TokenResponseDTO login(LoginRequestDTO request) {
+        String normalizedEmail = request.email().trim().toLowerCase(Locale.ROOT);
+
+        Customer customer = customerRepository.findByEmailIgnoreCase(normalizedEmail)
+                .orElseThrow(InvalidCredentialsException::new);
+
+        if (!passwordEncoder.matches(request.password(), customer.getPasswordHash())) {
+            throw new InvalidCredentialsException();
+        }
+
+        String token = jwtService.generateToken(customer.getId());
+
+        return new TokenResponseDTO(token, "Bearer", jwtService.getExpirationSeconds());
     }
 }
