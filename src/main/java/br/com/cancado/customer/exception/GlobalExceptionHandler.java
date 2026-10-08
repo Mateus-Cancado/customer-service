@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -98,6 +97,23 @@ public class GlobalExceptionHandler {
                 status.value(),
                 error,
                 "Ocorreu uma falha ao processar a requisição. Tente novamente mais tarde.",
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(CustomerIsInactiveException.class)
+    public ResponseEntity<StandardErrorDTO> handleCustomerIsInactiveException(CustomerIsInactiveException e, HttpServletRequest request) {
+
+        String error = "Usuário está inativo.";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        StandardErrorDTO err = new StandardErrorDTO(
+                Instant.now(),
+                status.value(),
+                error,
+                e.getMessage(),
                 request.getRequestURI()
         );
 
