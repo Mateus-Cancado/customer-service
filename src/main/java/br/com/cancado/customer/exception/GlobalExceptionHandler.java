@@ -119,5 +119,22 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(status).body(err);
     }
+
+    @ExceptionHandler(CustomerIsActiveException.class)
+    public ResponseEntity<StandardErrorDTO> handleCustomerIsActiveException(CustomerIsActiveException e, HttpServletRequest request) {
+
+        String error = "Usuário está ativo.";
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        StandardErrorDTO err = new StandardErrorDTO(
+                Instant.now(),
+                status.value(),
+                error,
+                e.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(status).body(err);
+    }
 }
 
