@@ -1,6 +1,8 @@
 package br.com.cancado.customer.service;
 
 import br.com.cancado.customer.dto.CustomerResponseDTO;
+import br.com.cancado.customer.enums.CustomerStatus;
+import br.com.cancado.customer.exception.CustomerIsInactiveException;
 import br.com.cancado.customer.exception.CustomerNotFoundException;
 import br.com.cancado.customer.mapper.CustomerMapper;
 import br.com.cancado.customer.model.Customer;
@@ -26,5 +28,20 @@ public class CustomerService {
                 .orElseThrow(CustomerNotFoundException::new);
 
         return customerMapper.toResponse(customer);
+    }
+
+    @Transactional
+    public void delete(UUID customerId) {
+        if (customerId == null) throw new NullPointerException();
+
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(CustomerNotFoundException::new);
+
+        if (customer.getStatus().equals(CustomerStatus.INACTIVE)) {
+            throw new CustomerIsInactiveException("Falha ao deletar. Usuário já está inativo.");
+        }
+
+        customer.setStatus(CustomerStatus.INACTIVE);
+        customerRepository.save(customer);
     }
 }
