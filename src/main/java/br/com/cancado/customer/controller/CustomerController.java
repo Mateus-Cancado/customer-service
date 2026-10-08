@@ -1,7 +1,9 @@
 package br.com.cancado.customer.controller;
 
 import br.com.cancado.customer.dto.CustomerResponseDTO;
+import br.com.cancado.customer.dto.UpdatePasswordDTO;
 import br.com.cancado.customer.service.CustomerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,6 +41,14 @@ public class CustomerController {
         UUID customerId = UUID.fromString(Objects.requireNonNull(jwt.getSubject()));
 
         customerService.activeProfile(customerId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/me/password")
+    public ResponseEntity<Void> updatePassword(@AuthenticationPrincipal Jwt jwt, @RequestBody @Valid UpdatePasswordDTO request) {
+        UUID customerId = UUID.fromString(Objects.requireNonNull(jwt.getSubject()));
+
+        customerService.updatePassword(customerId, request);
         return ResponseEntity.noContent().build();
     }
 }
