@@ -2,6 +2,7 @@ package br.com.cancado.customer.mapper;
 
 import br.com.cancado.customer.dto.CustomerResponseDTO;
 import br.com.cancado.customer.dto.RegisterRequestDTO;
+import br.com.cancado.customer.enums.CustomerStatus;
 import br.com.cancado.customer.model.Customer;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ public class CustomerMapper {
         if (dto == null) return null;
 
         Customer customer = new Customer();
+        customer.setStatus(CustomerStatus.ACTIVE);
         customer.setName(dto.name().trim());
         customer.setEmail(dto.email().trim().toLowerCase(Locale.ROOT));
         customer.setPasswordHash(passwordHash);
@@ -25,6 +27,7 @@ public class CustomerMapper {
 
         return new CustomerResponseDTO(
                 customer.getId(),
+                customer.getStatus(),
                 customer.getName(),
                 customer.getEmail(),
                 customer.getCreatedAt()

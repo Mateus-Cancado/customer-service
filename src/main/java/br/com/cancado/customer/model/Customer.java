@@ -1,5 +1,6 @@
 package br.com.cancado.customer.model;
 
+import br.com.cancado.customer.enums.CustomerStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -21,6 +22,10 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.UUID)
     @EqualsAndHashCode.Include
     private UUID id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private CustomerStatus status;
 
     @Column(name = "name", nullable = false, length = 150)
     private String name;
