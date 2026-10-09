@@ -4,6 +4,7 @@ import br.com.cancado.customer.dto.CustomerResponseDTO;
 import br.com.cancado.customer.dto.LoginRequestDTO;
 import br.com.cancado.customer.dto.RegisterRequestDTO;
 import br.com.cancado.customer.dto.TokenResponseDTO;
+import br.com.cancado.customer.enums.CustomerStatus;
 import br.com.cancado.customer.exception.EmailAlreadyExistsException;
 import br.com.cancado.customer.exception.InvalidCredentialsException;
 import br.com.cancado.customer.mapper.CustomerMapper;
@@ -54,6 +55,10 @@ public class AuthService {
                 .orElseThrow(InvalidCredentialsException::new);
 
         if (!passwordEncoder.matches(request.password(), customer.getPasswordHash())) {
+            throw new InvalidCredentialsException();
+        }
+
+        if (customer.getStatus() != CustomerStatus.ACTIVE) {
             throw new InvalidCredentialsException();
         }
 
